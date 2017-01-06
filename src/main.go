@@ -13,5 +13,6 @@ func main() {
 	r.GET("/users", uc.GetUsers)
 	r.POST("/user", uc.CreateUser)
 	r.DELETE("/user/:id", uc.RemoveUser)
+	//TODO - Use config to determine the port
 	http.ListenAndServe("localhost:8001", r)
 }
