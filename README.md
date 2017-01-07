@@ -1,3 +1,4 @@
 # goboot
 
-This is a sample Microservice build golang (something lile Spring boot)
+This is a sample Microservice built in golang (similar to Spring boot)
+More refactoring coming soon..
