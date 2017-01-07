@@ -1,0 +1,9 @@
+{
+  "engine": "mysql",
+  "server": "localhost",
+  "port": "3306",
+  "user": "root",
+  "password": "root",
+  "database": "mygodb",
+  "serverport":"8002"
+}

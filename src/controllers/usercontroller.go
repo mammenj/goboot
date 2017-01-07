@@ -4,65 +4,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
 
+	"config"
+	"daos"
 	"models"
+	"strconv"
 )
-
-var session *mgo.Session
 
 type (
-	UserController struct{}
+	MyUserController struct{}
 )
 
-func NewUserController() *UserController {
-	s, err := mgo.Dial("mongodb://localhost")
-	session = s
+var myuserDao daos.UserDao
+
+func NewMyUserController() *MyUserController {
+	myconfig, err := config.GetConfiguration()
 	if err != nil {
-		panic(err)
-
+		log.Fatal(err)
+		return nil
 	}
-	return &UserController{}
+	userDao := daos.UserFactoryDao(myconfig.Engine)
+	myuserDao = userDao
+	return &MyUserController{}
 }
 
 /*
-curl http://localhost:8001/user/hexid
+curl -GET http://localhost:8002/users
 */
-func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	id := p.ByName("id")
-	log.Printf("GetUser ID of user is >>>>> %s", id)
-	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(404)
-		return
-	}
-	oid := bson.ObjectIdHex(id)
-
-	u := models.User{}
-
-	if err := session.DB("msa_DB").C("users").FindId(oid).One(&u); err != nil {
-		w.WriteHeader(404)
-		return
-	}
-
-	jsonU, _ := json.Marshal(u)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	fmt.Fprintf(w, "%s", jsonU)
-}
-
-/*
-curl http://localhost:8001/users
-*/
-func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (uc MyUserController) GetUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	log.Printf("List all Users  >>>>> ")
-	us := []models.User{}
-	if err := session.DB("msa_DB").C("users").Find(nil).All(&us); err != nil {
-		log.Printf("GetUsers all Users  >>>>> %s ", err)
-		w.WriteHeader(404)
+	us, err := myuserDao.GetAll()
+	if err != nil {
+		log.Fatal(err)
 		return
 	}
 	jsonUs, _ := json.Marshal(us)
@@ -72,16 +47,17 @@ func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request, p http
 }
 
 /*
-curl -XPOST -H 'Content-Type: application/json' -d
-'{"name": "L John Mammen", "gender": "male", "age": 15}' http://localhost:8001/user
+curl -XPOST -H 'Content-Type: application/json' -d '{"name": "L John Mammen", "gender": "male", "age": 15}' http://localhost:8002/user
 */
-
-func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (uc MyUserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
 	json.NewDecoder(r.Body).Decode(&u)
-	u.Id = bson.NewObjectId()
+	err := myuserDao.Create(&u)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	log.Printf("Create User ID of user is >>>>> %s", u.Id)
-	session.DB("msa_DB").C("users").Insert(u)
 	jsonU, _ := json.Marshal(u)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
@@ -89,19 +65,57 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 }
 
 /*
-curl -XDELETE http://localhost:8001/user/hexid
+curl -H 'Content-Type: application/json' -H 'Accept: application/json' -X PUT -d '{"name": "L John Mammen", "gender": "male", "age": 15, "id":5}' http://localhost:8002/user
+
+ */
+
+func (uc MyUserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	u := models.User{}
+	json.NewDecoder(r.Body).Decode(&u)
+	err := myuserDao.Update(&u)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	log.Printf("Create User ID of user is >>>>> %s", u.Id)
+	jsonU, _ := json.Marshal(u)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	fmt.Fprintf(w, "%s", jsonU)
+}
+
+/*
+curl -XDELETE http://localhost:8002/user/id
 */
-func (uc UserController) RemoveUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	id := p.ByName("id")
+func (uc MyUserController) RemoveUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id, err := strconv.Atoi(p.ByName("id"))
 	log.Printf("RemoveUser ID of user is >>>>> %s", id)
-	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(404)
+
+	err = myuserDao.Delete(id)
+	if err != nil {
+		log.Fatal(err)
 		return
 	}
-	oid := bson.ObjectIdHex(id)
-	if err := session.DB("msa_DB").C("users").RemoveId(oid); err != nil {
-		w.WriteHeader(404)
+	log.Printf("Removed User ID of user is >>>>> %s", id)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	fmt.Fprintf(w, "%s %n", "Removed User", id)
+}
+
+/*
+curl -GET http://localhost:8002/user/id
+*/
+func (uc MyUserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id, err := strconv.Atoi(p.ByName("id"))
+	log.Printf("GET user ID is >>>>> %s", id)
+	user, err := myuserDao.Get(id)
+	jsonU, _ := json.Marshal(user)
+	if err != nil {
+		log.Fatal(err)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+	fmt.Fprintf(w, "%s", jsonU)
 }
