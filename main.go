@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github.com/mammenj/goboot/config"
 	"github.com/mammenj/goboot/controllers"
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
@@ -21,7 +21,7 @@ func main() {
 	r.POST("/user", uc.CreateUser)
 	r.PUT("/user", uc.UpdateUser)
 	r.DELETE("/user/:id", uc.RemoveUser)
-	server :=  config.Server_port
-	log.Printf("Started server %s .....",server)
+	server := config.Server_port
+	log.Printf("Started server %s .....", server)
 	http.ListenAndServe(server, r)
 }

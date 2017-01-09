@@ -7,6 +7,5 @@ type UserDao interface {
 	GetAll() ([]models.User, error)
 	Create(u *models.User) error
 	Delete(i int) error
-	Update (u *models.User) error
-
+	Update(u *models.User) error
 }

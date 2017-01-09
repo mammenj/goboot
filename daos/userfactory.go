@@ -8,7 +8,7 @@ func UserFactoryDao(e string) UserDao {
 	case "mysql":
 		dao = UserImplMysql{}
 	default:
-		log.Fatalf("Errorr ", e)
+		log.Fatalf("Errorr %s", e)
 		return nil
 	}
 	return dao

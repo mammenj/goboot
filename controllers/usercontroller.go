@@ -67,7 +67,7 @@ func (uc MyUserController) CreateUser(w http.ResponseWriter, r *http.Request, p 
 /*
 curl -H 'Content-Type: application/json' -H 'Accept: application/json' -X PUT -d '{"name": "L John Mammen", "gender": "male", "age": 15, "id":5}' http://localhost:8002/user
 
- */
+*/
 
 func (uc MyUserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
@@ -89,17 +89,17 @@ curl -XDELETE http://localhost:8002/user/id
 */
 func (uc MyUserController) RemoveUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	id, err := strconv.Atoi(p.ByName("id"))
-	log.Printf("RemoveUser ID of user is >>>>> %s", id)
+	log.Printf("RemoveUser ID of user is >>>>> %d", id)
 
 	err = myuserDao.Delete(id)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	log.Printf("Removed User ID of user is >>>>> %s", id)
+	log.Printf("Removed User ID of user is >>>>> %d", id)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
-	fmt.Fprintf(w, "%s %n", "Removed User", id)
+	fmt.Fprintf(w, "%s %d", "Removed User", id)
 }
 
 /*
@@ -107,7 +107,7 @@ curl -GET http://localhost:8002/user/id
 */
 func (uc MyUserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	id, err := strconv.Atoi(p.ByName("id"))
-	log.Printf("GET user ID is >>>>> %s", id)
+	log.Printf("GET user ID is >>>>> %d", id)
 	user, err := myuserDao.Get(id)
 	jsonU, _ := json.Marshal(user)
 	if err != nil {

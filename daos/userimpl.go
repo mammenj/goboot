@@ -112,7 +112,7 @@ func (dao UserImplMysql) Update(u *models.User) error {
 		return err
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(u.Name, u.Gender, u.Age,u.Id)
+	result, err := stmt.Exec(u.Name, u.Gender, u.Age, u.Id)
 	if err != nil {
 		return err
 	}

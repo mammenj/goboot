@@ -1,10 +1,10 @@
 package daos
 
 import (
-	"github.com/mammenj/goboot/config"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mammenj/goboot/config"
 	"log"
 )
 
