@@ -1,6 +1,6 @@
 package daos
 
-import "models"
+import "github.com/mammenj/goboot/models"
 
 type UserDao interface {
 	Get(i int) (models.User, error)

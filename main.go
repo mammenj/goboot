@@ -1,8 +1,8 @@
 package main
 
 import (
-	"config"
-	"controllers"
+	"github.com/mammenj/goboot/config"
+	"github.com/mammenj/goboot/controllers"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"

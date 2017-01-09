@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 
-	"config"
-	"daos"
-	"models"
+	"github.com/mammenj/goboot/config"
+	"github.com/mammenj/goboot/daos"
+	"github.com/mammenj/goboot/models"
 	"strconv"
 )
 
