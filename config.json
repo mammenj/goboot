@@ -5,5 +5,5 @@
   "user": "root",
   "password": "root",
   "database": "mygodb",
-  "serverport":"8002"
+  "Server_port":"localhost:8002"
 }
