@@ -7,7 +7,8 @@ import (
 
 func GetConfiguration() (Configuration, error) {
 	myconfig := Configuration{}
-	file, err := os.Open("C:\\Users\\john.mammen01\\GoglandProjects\\goboot2\\goboot\\src\\config\\config.json")
+
+	file, err := os.Open(".\\config.json")
 	if err != nil {
 		return myconfig, err
 	}

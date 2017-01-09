@@ -21,6 +21,7 @@ func main() {
 	r.POST("/user", uc.CreateUser)
 	r.PUT("/user", uc.UpdateUser)
 	r.DELETE("/user/:id", uc.RemoveUser)
-	server := "localhost:" + config.Serverport
+	server :=  config.Server_port
+	log.Printf("Started server %s .....",server)
 	http.ListenAndServe(server, r)
 }

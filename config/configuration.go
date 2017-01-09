@@ -7,5 +7,5 @@ type Configuration struct {
 	User       string
 	Password   string
 	Database   string
-	Serverport string
+	Server_port string
 }
