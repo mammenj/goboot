@@ -1,6 +1,9 @@
 package daos
 
-import "github.com/mammenj/goboot/models"
+import (
+	"database/sql"
+	"github.com/mammenj/goboot/models"
+)
 
 type UserImplMysql struct {
 }
@@ -102,8 +105,7 @@ func (dao UserImplMysql) Get(id int) (models.User, error) {
 }
 
 func (dao UserImplMysql) Update(u *models.User) error {
-	query := "UPDATE allusers SET name=?, gender=?, age=? WHERE id=?"
-
+	query := "UPDATE allusers SET name = ?, gender = ?, age = ? WHERE id=?"
 	db := get()
 	defer db.Close()
 	stmt, err := db.Prepare(query)
@@ -112,14 +114,19 @@ func (dao UserImplMysql) Update(u *models.User) error {
 		return err
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(u.Name, u.Gender, u.Age, u.Id)
+	_, err = stmt.Query(NewNullString(u.Name), NewNullString(u.Gender), u.Age, u.Id)
 	if err != nil {
 		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
-	u.Id = int(id)
 	return nil
+}
+
+func NewNullString(s string) sql.NullString {
+	if len(s) == 0 {
+		return sql.NullString{}
+	}
+	return sql.NullString{
+		String: s,
+		Valid:  true,
+	}
 }

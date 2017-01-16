@@ -66,7 +66,6 @@ func (uc MyUserController) CreateUser(w http.ResponseWriter, r *http.Request, p 
 
 /*
 curl -H 'Content-Type: application/json' -H 'Accept: application/json' -X PUT -d '{"name": "L John Mammen", "gender": "male", "age": 15, "id":5}' http://localhost:8002/user
-
 */
 
 func (uc MyUserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -77,8 +76,8 @@ func (uc MyUserController) UpdateUser(w http.ResponseWriter, r *http.Request, p 
 		log.Fatal(err)
 		return
 	}
-	log.Printf("Create User ID of user is >>>>> %s", u.Id)
 	jsonU, _ := json.Marshal(u)
+	log.Printf("Update User is >>>>> %s", jsonU)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 	fmt.Fprintf(w, "%s", jsonU)
