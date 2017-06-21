@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	//mysql reference to sql interfaces
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mammenj/goboot/config"
 )
