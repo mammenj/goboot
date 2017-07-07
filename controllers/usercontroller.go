@@ -13,11 +13,10 @@ import (
 	"github.com/mammenj/goboot/models"
 )
 
-type (
-	MyUserController struct{}
-)
-
-var myuserDao daos.UserDao
+// MyUserController controller
+type MyUserController struct {
+	myuserDao daos.UserDao
+}
 
 // NewMyUserController creating controller
 func NewMyUserController() *MyUserController {
@@ -26,9 +25,10 @@ func NewMyUserController() *MyUserController {
 		log.Fatal(err)
 		return nil
 	}
-	userDao := daos.UserFactoryDao(myconfig.Engine)
-	myuserDao = userDao
-	return &MyUserController{}
+
+	myController := &MyUserController{}
+	myController.myuserDao = daos.UserFactoryDao(myconfig.Engine)
+	return myController
 }
 
 /*
@@ -37,7 +37,7 @@ curl -GET http://localhost:8002/users
 */
 func (uc MyUserController) GetUsers(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	log.Printf("List all Users  >>>>> ")
-	us, err := myuserDao.GetAll()
+	us, err := uc.myuserDao.GetAll()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -55,7 +55,7 @@ curl -XPOST -H 'Content-Type: application/json' -d '{"name": "L John Mammen", "g
 func (uc MyUserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
 	json.NewDecoder(r.Body).Decode(&u)
-	err := myuserDao.Create(&u)
+	err := uc.myuserDao.Create(&u)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +75,7 @@ curl -H 'Content-Type: application/json' -H 'Accept: application/json' -X PUT -d
 func (uc MyUserController) UpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
 	json.NewDecoder(r.Body).Decode(&u)
-	err := myuserDao.Update(&u)
+	err := uc.myuserDao.Update(&u)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -95,7 +95,7 @@ func (uc MyUserController) RemoveUser(w http.ResponseWriter, r *http.Request, p 
 	id, err := strconv.Atoi(p.ByName("id"))
 	log.Printf("RemoveUser ID of user is >>>>> %d", id)
 
-	err = myuserDao.Delete(id)
+	err = uc.myuserDao.Delete(id)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -113,7 +113,7 @@ curl -GET http://localhost:8002/user/id
 func (uc MyUserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	id, err := strconv.Atoi(p.ByName("id"))
 	log.Printf("GET user ID is >>>>> %d", id)
-	user, err := myuserDao.Get(id)
+	user, err := uc.myuserDao.Get(id)
 	jsonU, _ := json.Marshal(user)
 	if err != nil {
 		log.Fatal(err)
